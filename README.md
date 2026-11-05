@@ -53,8 +53,12 @@ uvicorn app.main:app --port 7860
 Ou com Docker:
 
 ```bash
-docker build -t cnh-api . && docker run -p 7860:7860 cnh-api
+docker build -t cnh-api . && docker run --rm -p 8080:8080 cnh-api
 ```
+
+O servidor começa a escutar antes do carregamento do PaddleOCR. Enquanto o modelo e o OCR
+inicializam, `/health` e `/predict` respondem `503`; `/health` passa a responder `200` quando
+o serviço estiver pronto. Se a inicialização falhar, consulte os logs do container.
 
 ## Usar a API
 

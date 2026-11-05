@@ -2,11 +2,12 @@ import io
 import logging
 import os
 import secrets
+import threading
 import time
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, UploadFile
+from fastapi import Depends, FastAPI, File, Header, HTTPException, Query, Request, UploadFile
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 
@@ -25,10 +26,21 @@ Image.MAX_IMAGE_PIXELS = 60_000_000                  # proteção contra "decomp
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.modelo = ModeloCNH(MODEL_PATH)
-    log.info("Modelo carregado. Classes: %s", app.state.modelo.classes)
-    ocr.carregar()
-    log.info("PaddleOCR pronto (device=%s)", ocr.OCR_DEVICE)
+    app.state.status = "loading"
+
+    def carregar_servico():
+        try:
+            modelo = ModeloCNH(MODEL_PATH)
+            log.info("Modelo carregado. Classes: %s", modelo.classes)
+            ocr.carregar()
+            app.state.modelo = modelo
+            app.state.status = "ready"
+            log.info("PaddleOCR pronto (device=%s)", ocr.OCR_DEVICE)
+        except Exception:
+            app.state.status = "error"
+            log.exception("Falha ao inicializar o modelo ou o PaddleOCR")
+
+    threading.Thread(target=carregar_servico, name="model-loader", daemon=True).start()
     yield
 
 
@@ -54,13 +66,33 @@ def raiz():
 
 
 @app.get("/health")
-def health():
-    return {"status": "ok", "classes": app.state.modelo.classes}
+def health(request: Request):
+    status = request.app.state.status
+    if status != "ready":
+        detalhe = (
+            "Falha ao inicializar o serviço; consulte os logs."
+            if status == "error"
+            else "Serviço inicializando."
+        )
+        raise HTTPException(status_code=503, detail=detalhe)
+    return {"status": "ok", "classes": request.app.state.modelo.classes}
 
 
 @app.post("/predict", response_model=Predicao, dependencies=[Depends(checar_chave)])
-def predict(file: UploadFile = File(...),
-            debug: bool = Query(False, description="Inclui features, rotação e texto do OCR na resposta")):
+def predict(
+    request: Request,
+    file: UploadFile = File(...),
+    debug: bool = Query(False, description="Inclui features, rotação e texto do OCR na resposta"),
+):
+    status = request.app.state.status
+    if status != "ready":
+        detalhe = (
+            "Falha ao inicializar o serviço; consulte os logs."
+            if status == "error"
+            else "Serviço inicializando."
+        )
+        raise HTTPException(status_code=503, detail=detalhe)
+
     t0 = time.perf_counter()
 
     dados = file.file.read(MAX_BYTES + 1)
@@ -77,7 +109,7 @@ def predict(file: UploadFile = File(...),
 
     passes, meta = ocr.extrair_passes(img)
     feats = calcular_features(passes)
-    resultado = app.state.modelo.prever(feats)
+    resultado = request.app.state.modelo.prever(feats)
 
     out = {**resultado, "tempo_ms": int((time.perf_counter() - t0) * 1000)}
     if debug:
