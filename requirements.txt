@@ -5,7 +5,7 @@ python-multipart>=0.0.9
 requests>=2.31
 
 # --- OCR (CPU). Fixe na MESMA versão que você usou no Colab: !pip show paddleocr ---
-paddlepaddle-gpu==3.2.0
+paddlepaddle==3.2.0
 paddleocr>=3.2.0,<4
 pillow>=10
 numpy

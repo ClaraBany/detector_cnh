@@ -18,7 +18,7 @@ CORRIGIR_ORIENTACAO = True
 LARGURA_ALVO = 1600
 ESCALA_MAX = 2.0
 OCR_LANG = "pt"
-OCR_DEVICE = os.getenv("OCR_DEVICE", "gpu:0")          # "gpu:0" se um dia usar GPU
+OCR_DEVICE = os.getenv("OCR_DEVICE", "CPU")          # "gpu:0" se um dia usar GPU
 
 REC_SCORE_PIPELINE = 0.0
 CONF_MIN = 0.50

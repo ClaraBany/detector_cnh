@@ -13,16 +13,17 @@ ENV HOME=/home/user \
     PYTHONUNBUFFERED=1 \
     PADDLE_PDX_CACHE_HOME=/home/user/.paddlex \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
-    OCR_DEVICE=gpu:0
+    OCR_DEVICE=cpu
 
-WORKDIR /home/user/app
+WORKDIR /home/user
 
-COPY --chown=user requirements.txt .
+# Copia os arquivos mantendo a estrutura de pastas na raiz do usuário
+COPY --chown=user . /home/user/
+
+# Instala as dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY --chown=user . .
-
-# baixa os modelos do PaddleOCR durante o build (evita baixar a cada start)
+# Baixa os modelos do PaddleOCR durante o build
 RUN python -m scripts.warmup
 
 EXPOSE 7860
