@@ -1,0 +1,18 @@
+# --- API ---
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1
+python-multipart>=0.0.9
+requests>=2.31
+
+# --- OCR (CPU). Fixe na MESMA versão que você usou no Colab: !pip show paddleocr ---
+paddlepaddle-gpu==3.2.0
+paddleocr>=3.2.0,<4
+pillow>=10
+numpy
+rapidfuzz>=3
+
+# --- Modelo: use EXATAMENTE as versões do ambiente onde você treinou ---
+# No notebook de treino rode: !pip list | grep -i -E "scikit-learn|joblib|pandas|numpy|xgboost|lightgbm"
+pandas
+joblib
+scikit-learn==1.6.1       # <-- TROQUE pela versão do treino
