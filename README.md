@@ -108,3 +108,5 @@ Documentação interativa em `/docs`. Health check em `/health`.
 - **Space gratuito dorme** após ~48 h sem uso; a primeira chamada depois disso demora para acordar.
 - Não altere `app/ocr.py` nem `app/features.py` sem retreinar o modelo: as features precisam sair
   exatamente como no treino.
+
+# detector_cnh
