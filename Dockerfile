@@ -1,11 +1,24 @@
-FROM python:3.12
+# 1. Altera a imagem base para uma que inclua o CUDA 12.6 Runtime
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
 
-# libs de sistema exigidas pelo OpenCV e pelo Paddle
+# Evita perguntas interativas durante a instalação de pacotes
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 2. Instala o Python 3.12 e as dependências do sistema necessárias para OpenCV e Paddle
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libgl1 libglib2.0-0 libgomp1 \
+        python3.12 \
+        python3-pip \
+        python3.12-dev \
+        libgl1 \
+        libglib2.0-0 \
+        libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Executa como usuário sem privilégios.
+# 3. Define o Python 3.12 recém-instalado como o padrão para os comandos 'python' e 'pip'
+RUN ln -sf /usr/bin/python3.12 /usr/bin/python \
+    && ln -sf /usr/bin/pip3 /usr/bin/pip
+
+# Executa como usuário sem privilégios (mantendo as boas práticas de segurança)
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
@@ -18,11 +31,12 @@ ENV HOME=/home/user \
 
 WORKDIR /home/user
 
-# Copia os arquivos mantendo a estrutura de pastas na raiz do usuário
+# Copia os arquivos mantendo a estrutura de pastas
 COPY --chown=user . /home/user/
 
-# Instala as dependências
-RUN pip install --no-cache-dir -r requirements.txt
+# Garante que o pip esteja atualizado e instala as dependências
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
 
