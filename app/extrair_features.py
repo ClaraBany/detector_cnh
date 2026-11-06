@@ -75,7 +75,8 @@ COLUNAS_FEATURES = (
     [n for n, _, _ in FLAGS_REGEX]
     + [n for n, _ in FRASES_FUZZY]
     + ["qtd_linhas_mrz", "qtd_rotulos_campos",
-       "flag_cpf_formato", "flag_cpf_checksum", "flag_codigo_lateral_11"]
+       "flag_cpf_formato", "flag_cpf_checksum", "flag_codigo_lateral_11",
+       "n_tokens", "flag_texto_vazio", "qtd_simbolo_menor"]
 )
 NOMES_FEATURES = list(COLUNAS_FEATURES)
 
@@ -142,6 +143,13 @@ def extrair_features_dict(passes):
     # 6) código lateral (vertical) de 11 dígitos
     lat = [re.sub(r"\s", "", l) for l in (row["rot90"] + "\n" + row["rot270"]).splitlines()]
     f["flag_codigo_lateral_11"] = int(any(re.search(r"(?<!\d)\d{11}(?!\d)", l) for l in lat))
+
+    # 7) métricas do texto principal (o modelo foi treinado com elas)
+    principal = row["principal"]
+    n_tokens = len(re.findall(r"\w+", principal))
+    f["n_tokens"] = n_tokens
+    f["flag_texto_vazio"] = int(n_tokens < 5)
+    f["qtd_simbolo_menor"] = principal.count("<")
 
     assert set(f) == set(COLUNAS_FEATURES), "COLUNAS_FEATURES não bate com o que é calculado"
     return f

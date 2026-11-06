@@ -1,18 +1,25 @@
-# --- API ---
-fastapi>=0.110,<1
-uvicorn[standard]>=0.29,<1
-python-multipart>=0.0.9
-requests>=2.31
+# Python 3.10 a 3.12 recomendado
 
-# --- OCR (CPU). Fixe na MESMA versão que você usou no Colab: !pip show paddleocr ---
-paddlepaddle==3.2.0
-paddleocr>=3.2.0,<4
-pillow>=10
-numpy
-rapidfuzz>=3
+# ---------- OCR ----------
+# CPU (funciona em qualquer máquina):
+paddlepaddle==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
+# GPU NVIDIA (CUDA 12.6): comente a linha acima e instale à parte com:
+#   pip install paddlepaddle-gpu====3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu126/
+paddleocr==3.7.0
 
-# --- Modelo: use EXATAMENTE as versões do ambiente onde você treinou ---
-# No notebook de treino rode: !pip list | grep -i -E "scikit-learn|joblib|pandas|numpy|xgboost|lightgbm"
-pandas
-joblib
-scikit-learn==1.6.1       # <-- TROQUE pela versão do treino
+# ---------- Imagem ----------
+opencv-python-headless==5.0.0.93
+pillow==11.3.0
+requests==2.32.4
+
+# ---------- Features ----------
+rapidfuzz==3.14.6
+
+# ---------- Modelo ----------
+numpy==2.3.5
+pandas==2.2.3
+joblib==1.6.0
+# IMPORTANTE: use a MESMA versão do scikit-learn do treino (no Colab: import sklearn; print(sklearn._version_))
+# Exemplo: scikit-learn====1.6.1
+scikit-learn==1.6.1
+xgboost==3.4.1
