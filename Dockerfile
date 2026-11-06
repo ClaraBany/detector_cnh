@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgl1 libglib2.0-0 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Hugging Face Spaces roda como usuário 1000
+# Executa como usuário sem privilégios.
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
@@ -13,7 +13,8 @@ ENV HOME=/home/user \
     PYTHONUNBUFFERED=1 \
     PADDLE_PDX_CACHE_HOME=/home/user/.paddlex \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
-    OCR_DEVICE=cpu
+    OCR_DEVICE=cpu \
+    CAMINHO_MODELO=/home/user/app/modelo.joblib
 
 WORKDIR /home/user
 
@@ -23,9 +24,6 @@ COPY --chown=user . /home/user/
 # Instala as dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Baixa os modelos do PaddleOCR durante o build
-RUN python -m scripts.warmup
-
 EXPOSE 8080
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "uvicorn app.api:app --host 0.0.0.0 --port ${PORT:-8080}"]

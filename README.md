@@ -45,9 +45,13 @@ requirements.txt
 ## Rodar localmente
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
+# Linux/macOS:
+# source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --port 7860
+uvicorn app.api:app --host 0.0.0.0 --port 8080
 ```
 
 Ou com Docker:
@@ -63,9 +67,9 @@ o serviço estiver pronto. Se a inicialização falhar, consulte os logs do cont
 ## Usar a API
 
 ```bash
-curl -X POST "http://localhost:7860/predict" -F "file=@minha_cnh.jpg"
+curl -X POST "http://localhost:8080/predict" -F "file=@minha_cnh.jpg"
 # com debug (features, rotação, texto do OCR):
-curl -X POST "http://localhost:7860/predict?debug=true" -F "file=@minha_cnh.jpg"
+curl -X POST "http://localhost:8080/predict?debug=true" -F "file=@minha_cnh.jpg"
 ```
 
 Resposta:
@@ -80,6 +84,27 @@ Resposta:
 ```
 
 Documentação interativa em `/docs`. Health check em `/health`.
+
+## Deploy no Google Cloud Run
+
+O repositório conectado ao Cloud Run pode fazer o deploy automaticamente após cada push
+na branch configurada. O serviço usa o `Dockerfile` da raiz e inicia `app.api:app`.
+
+1. Confirme que `app/modelo.joblib` está no repositório e que o build do Cloud Run está
+   configurado para usar o Dockerfile.
+2. Em **Cloud Run → serviço → Editar e implantar nova revisão → Variáveis e secrets**,
+   configure `OCR_DEVICE=cpu`. O caminho do modelo já está configurado no Dockerfile.
+3. Reserve memória suficiente para o modelo e o PaddleOCR; se a instância encerrar ou
+   reiniciar durante o carregamento, aumente a memória e confira os logs da revisão.
+4. Faça push para a branch conectada. Aguarde o build e o deploy da nova revisão.
+5. Teste `https://SUA_URL/health` e depois envie uma imagem como multipart para
+   `https://SUA_URL/predict`. A documentação fica em `https://SUA_URL/docs`.
+
+Exemplo de chamada:
+
+```bash
+curl -X POST "https://SUA_URL/predict" -F "file=@minha_cnh.jpg"
+```
 
 ## Deploy no Hugging Face Spaces
 
