@@ -13,7 +13,7 @@ ENV HOME=/home/user \
     PYTHONUNBUFFERED=1 \
     PADDLE_PDX_CACHE_HOME=/home/user/.paddlex \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True \
-    OCR_DEVICE=cpu \
+    OCR_DEVICE=gpu:0 \
     CAMINHO_MODELO=/home/user/app/modelo.joblib
 
 WORKDIR /home/user
