@@ -2,7 +2,7 @@
 """
 main.py - ORQUESTRAÇÃO: imagem -> OCR -> features -> modelo -> predição
 
-Fluxo (mesmo desenho do notebook_predict_modelo_exemplo):
+Fluxo:
 
     imagem (URL / base64 / caminho / bytes)
         |  ler_imagem.ler_imagem()                 PaddleOCR: texto de cada passada
@@ -27,20 +27,28 @@ import logging
 import os
 import sys
 import threading
+from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
 
-import extrair_features as ef
-from ler_imagem import carregar_modelos_ocr, ler_imagem
+if __package__:
+    from . import extrair_features as ef
+    from .ler_imagem import carregar_modelos_ocr, ler_imagem
+else:
+    import extrair_features as ef
+    from ler_imagem import carregar_modelos_ocr, ler_imagem
 
 log = logging.getLogger(__name__)
 
 # ======================================================================
 # CONFIGURAÇÕES (EDITE AQUI)
 # ======================================================================
-CAMINHO_MODELO = os.getenv("CAMINHO_MODELO", "modelo.joblib")
+CAMINHO_MODELO = os.getenv(
+    "CAMINHO_MODELO",
+    str(Path(__file__).resolve().with_name("modelo.joblib")),
+)
 
 MAPA_CLASSES = {0: "cnh_digital", 1: "cnh_fisica", 2: "invalido"}
 
