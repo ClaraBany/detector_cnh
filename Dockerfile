@@ -19,7 +19,7 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python \
     && ln -sf /usr/bin/pip3 /usr/bin/pip
 
 # Executa como usuário sem privilégios.
-RUN useradd -m -u 1000 user
+RUN useradd -m -u 1001 user
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH \
