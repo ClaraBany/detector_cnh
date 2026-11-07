@@ -1,24 +1,24 @@
-# 1. Altera a imagem base para uma que inclua o CUDA 12.6 Runtime
-FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
+# 1. Usamos Ubuntu 24.04 que já possui suporte nativo ao Python 3.12 e inclui cuDNN
+FROM nvidia/cuda:12.6.0-cudnn-runtime-ubuntu24.04
 
 # Evita perguntas interativas durante a instalação de pacotes
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Instala o Python 3.12 e as dependências do sistema necessárias para OpenCV e Paddle
+# 2. Instala o Python 3.12 (nativo do Ubuntu 24) e as libs de OpenCV/Paddle
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3.12 \
+        python3 \
         python3-pip \
-        python3.12-dev \
+        python3-dev \
         libgl1 \
         libglib2.0-0 \
         libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Define o Python 3.12 recém-instalado como o padrão para os comandos 'python' e 'pip'
-RUN ln -sf /usr/bin/python3.12 /usr/bin/python \
+# 3. Mapeia 'python' e 'pip' globais
+RUN ln -sf /usr/bin/python3 /usr/bin/python \
     && ln -sf /usr/bin/pip3 /usr/bin/pip
 
-# Executa como usuário sem privilégios (mantendo as boas práticas de segurança)
+# Executa como usuário sem privilégios.
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user \
@@ -31,12 +31,13 @@ ENV HOME=/home/user \
 
 WORKDIR /home/user
 
-# Copia os arquivos mantendo a estrutura de pastas
+# Copia os arquivos mantendo a estrutura de pastas na raiz do usuário
 COPY --chown=user . /home/user/
 
-# Garante que o pip esteja atualizado e instala as dependências
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Instala as dependências
+# Nota: O Ubuntu 24 exige a flag '--break-system-packages' para instalações pip globais em containers.
+RUN pip install --no-cache-dir --upgrade pip --break-system-packages && \
+    pip install --no-cache-dir -r requirements.txt --break-system-packages
 
 EXPOSE 8080
 
