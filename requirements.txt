@@ -8,8 +8,11 @@ python-multipart>=0.0.9
 # ---------- OCR ----------
 # CPU (funciona em qualquer máquina):
 # paddlepaddle==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
-# GPU NVIDIA (CUDA 12.6): comente a linha acima e instale à parte com:
-paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu126/
+
+# GPU NVIDIA (CUDA 12.6):
+--extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu126/
+paddlepaddle-gpu==3.2.0
+
 paddleocr==3.7.0
 
 # ---------- Imagem ----------
