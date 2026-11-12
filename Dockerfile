@@ -11,13 +11,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+RUN useradd -m -u 1001 user
+
 WORKDIR /home/user
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-RUN useradd -m -u 1001 user
 COPY --chown=user:user . /home/user/
+RUN mkdir -p /home/user/.paddlex && \
+    chown user:user /home/user /home/user/.paddlex
 
 ENV HOME=/home/user \
     PYTHONUNBUFFERED=1 \
