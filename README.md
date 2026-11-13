@@ -51,7 +51,7 @@ pela variável `MAX_UPLOAD_MB`. O limite não é aplicado ao conteúdo baixado d
 #### Enviar arquivo
 
 ```bash
-curl -X POST "https://SUA_URL/predict" \
+curl -X POST "https://https://modelocnh.cloud.run/predict" \
   -F "file=@minha_cnh.jpg"
 ```
 
@@ -60,14 +60,14 @@ curl -X POST "https://SUA_URL/predict" \
 Como formulário:
 
 ```bash
-curl -X POST "https://SUA_URL/predict" \
+curl -X POST "https://modelocnh.cloud.run/predict" \
   -F "url=https://servidor.com/imagens/cnh.jpg"
 ```
 
 Como JSON:
 
 ```bash
-curl -X POST "https://SUA_URL/predict" \
+curl -X POST "https://modelocnh.cloud.run/predict" \
   -H "Content-Type: application/json" \
   -d "{\"url\":\"https://servidor.com/imagens/cnh.jpg\"}"
 ```
@@ -79,7 +79,7 @@ A URL precisa usar `http://` ou `https://` e estar acessível pelo servidor da A
 Como JSON:
 
 ```bash
-curl -X POST "https://SUA_URL/predict" \
+curl -X POST "https://modelocnh.cloud.run/predict" \
   -H "Content-Type: application/json" \
   -d "{\"imagem_base64\":\"<BASE64_DA_IMAGEM>\"}"
 ```
@@ -92,7 +92,7 @@ O campo também aceita uma Data URI completa, por exemplo:
 Adicione `?debug=true` à URL para incluir OCR e diagnóstico:
 
 ```bash
-curl -X POST "https://SUA_URL/predict?debug=true" \
+curl -X POST "https://modelocnh.cloud.run/predict?debug=true" \
   -F "file=@minha_cnh.jpg"
 ```
 
@@ -124,5 +124,5 @@ curl -X POST "https://SUA_URL/predict?debug=true" \
 
 ## Documentação interativa
 
-Com o serviço ativo, acesse `https://SUA_URL/docs` para testar os endpoints pela interface
+Com o serviço ativo, acesse `https://modelocnh.cloud.run/docs` para testar os endpoints pela interface
 do FastAPI.
